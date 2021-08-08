@@ -250,6 +250,7 @@ def tune_eval(mod, params, dataset, batch_fn, tuning_opt, target='cuda', ctx=tvm
         print("time_evaluator: %.3fms (%.5fms)"%(t.mean(), t.std()))
         ######################################################################
 
+        '''
         # setup evaluaiton metric
         dataset.reset()
         batch_size = dataset.batch_size
@@ -295,18 +296,19 @@ def tune_eval(mod, params, dataset, batch_fn, tuning_opt, target='cuda', ctx=tvm
             # print("batch %d time : %.3fs" % (i, time.time()-t0))
         
         end = time.time()
+        '''
     
-    logging.info('[final] validation: acc-top1=%f acc-top5=%f', top1, top5)
+    # logging.info('[final] validation: acc-top1=%f acc-top5=%f', top1, top5)
     
     ########################################################
-    t_arr = np.array(t_arr[1:])*1000
-    print("size:",t_arr.size)
-    print(t_arr)
-    print("latency : %.3fms(per image) (%d-batch: %.3fms(%.3fms))"%(t_arr.mean()/batch_size, batch_size, t_arr.mean(), t_arr.std()))
-    print("Evaluation time : %.3fs"%(end-start))
+    # t_arr = np.array(t_arr[1:])*1000
+    # print("size:",t_arr.size)
+    # print(t_arr)
+    # print("latency : %.3fms(per image) (%d-batch: %.3fms(%.3fms))"%(t_arr.mean()/batch_size, batch_size, t_arr.mean(), t_arr.std()))
+    # print("Evaluation time : %.3fs"%(end-start))
     ########################################################
-    print("Tuning time : %.3f"%(tune_end-tune_start))
-    return top1
+    # print("Tuning time : %.3f"%(tune_end-tune_start))
+    # return top1
 
 
 def get_calibration_dataset(dataset, batch_fn, num_samples=100):
@@ -334,10 +336,11 @@ def test_quantize_acc(cfg, rec_val):
         orig = False
         
     mod, params = get_model(cfg.model, batch_size, qconfig, dataset=dataset, original=orig)
-    acc = tune_eval(mod, params, val_data, batch_fn, tuning_option, target='cuda', ctx=tvm.gpu(0))
-    print("Final accuracy", "fp32" if orig else "int8", acc)
+    tune_eval(mod, params, val_data, batch_fn, tuning_option, target='cuda', ctx=tvm.gpu(0))
+    
+    # print("Final accuracy", "fp32" if orig else "int8", acc)
 
-    return acc
+    # return acc
 
 
 if __name__ == "__main__":
@@ -357,5 +360,5 @@ if __name__ == "__main__":
     for config in configs:
         acc = test_quantize_acc(config, rec_val)
         results.append((config, acc))
-    for res in results:
-        print("{}\nQuantized Accuracy: {} vs. Expected Accuracy: {}".format(res[0].model, res[1], res[0].expected_acc))
+    # for res in results:
+        # print("{}\nQuantized Accuracy: {} vs. Expected Accuracy: {}".format(res[0].model, res[1], res[0].expected_acc))
